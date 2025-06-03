@@ -1,21 +1,31 @@
 Shift Scheduling Q1:
 
-
+Consider two sets of shifts: Set A includes evening shifts from 6 PM to 10 PM, and Set B includes early morning shifts from 5 AM to 9 AM. Suppose the employee is a college student who has early morning classes and a long commute. Even though both sets are equal in hours and pay, the algorithm treats them the same. However, the student would strongly prefer Set A due to their academic schedule and lifestyle. If required to take Set B, the worker might experience sleep deprivation, increased stress, and lower academic performance. Physically, waking up at 4 AM every day may cause chronic fatigue, and emotionally, it can result in burnout. To mitigate these costs, the worker might need to reduce class loads, alter transportation plans, or sacrifice personal time — all of which come with their own trade-offs.
 
 
 Shift Scheduling Q2:
 
-
+If a company assigns shifts without considering employee preferences, it may face increased absenteeism and last-minute shift cancellations. Employees who feel disregarded might become disengaged or quit, increasing turnover and training costs. Poor morale can also reduce productivity and negatively affect customer service. Additionally, overburdened or unhappy workers may take more sick leave, further disrupting operations. Ultimately, failing to consider human factors can hurt team dynamics and company reputation.
 
 
 Shift Scheduling Q3:
 
+Employee Availability: The algorithm should check when workers are actually available, including class times or caregiving responsibilities.
 
+Shift Preferences: Taking into account preferred working hours (e.g., mornings vs evenings) can boost satisfaction and performance.
+
+Work-Life Balance: Avoiding too many long shifts or insufficient rest between shifts helps protect workers' physical and mental health.
+
+Skill Matching: Ensuring employees are assigned shifts suited to their roles or experience levels avoids inefficiencies and stress.
+Considering these factors helps create a fairer, more sustainable schedule that benefits both employees and the employer.
 
 
 Shift Scheduling Q4:
 
+To: Manager
+Subject: Ethical and Practical Concerns with Profit-Only Shift Scheduling
 
+As we develop a profit-maximizing shift scheduler, it's crucial to recognize that optimizing purely for profit can lead to negative outcomes for workers and the company. Employees might be assigned shifts that conflict with their personal needs or result in exhaustion, leading to burnout, absenteeism, or even resignation. This not only affects team morale and cohesion but also increases operational costs related to turnover and retraining. To mitigate these harms, we can modify the scheduling system to generate all possible schedules that achieve maximum profit, rather than just one. A human manager or the employees themselves could then review and choose among these options, allowing for flexibility and fairness. Pairing this with a hybrid approach — where the algorithm suggests optimal shifts but final decisions consider human insight and context — ensures the system remains efficient while also empathetic. Additionally, gathering employee feedback and availability data could help the system learn and improve over time. This collaborative model helps maintain a productive, motivated workforce while still achieving operational goals.
 
 
 

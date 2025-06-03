@@ -1,22 +1,106 @@
 #include "ShiftScheduling.h"
 using namespace std;
 
-int numSchedulesFor(const Set<Shift>& shifts, int maxHours) {
-    /* TODO: Delete this comment and the lines below it, then implement
-     * this function.
-     */
-    (void) shifts;
-    (void) maxHours;
-    return -1;
+int countSchedules(Vector<Shift>& allShifts, int index, Vector<Shift>& currentSchedule, int hoursLeft) {
+    if (index == allShifts.size()) return 1; // Add schedule to total
+
+    // Do not include current shift
+    int total = countSchedules(allShifts, index + 1, currentSchedule, hoursLeft);
+
+    // Include current shift (if it doesn't overlap or exceed hours)
+    Shift current = allShifts[index];
+    int shiftLength = lengthOf(current);
+
+    bool overlap = false;
+    for (auto shift : currentSchedule) {
+        if (overlapsWith(shift, current)) {
+            overlap = true;
+            break;
+        }
+    }
+
+    if (!overlap && shiftLength <= hoursLeft) {
+        currentSchedule.add(current);
+        total += countSchedules(allShifts, index + 1, currentSchedule, hoursLeft - shiftLength);
+        currentSchedule.remove(currentSchedule.size() - 1);
+    }
+
+    return total;
 }
 
-Set<Shift> maxProfitSchedule(const Set<Shift>& shifts, int maxHours) {
-    /* TODO: Delete this comment and the lines below it, then implement
-     * this function.
-     */
-    (void) shifts;
-    (void) maxHours;
-    return {};
+void countSchedulesProfit(Vector<Shift>& allShifts, int index, Vector<Shift>& currentSchedule, int hoursLeft, int& currentProfit, int& maxProfit, Vector<Shift>& maxProfitSchedule) {
+    if (index == allShifts.size()) // Valid schedule created
+    {
+        if (currentProfit > maxProfit)
+        {
+            maxProfit = currentProfit;
+            maxProfitSchedule = currentSchedule;
+        }
+
+        return;
+    }
+
+    // Do not include current shift
+    countSchedulesProfit(allShifts, index + 1, currentSchedule, hoursLeft, currentProfit, maxProfit, maxProfitSchedule);
+
+    // Include current shift (if it doesn't overlap or exceed hours)
+    Shift current = allShifts[index];
+    int shiftLength = lengthOf(current);
+
+    bool overlap = false;
+    for (auto shift : currentSchedule) {
+        if (overlapsWith(shift, current)) {
+            overlap = true;
+            break;
+        }
+    }
+
+    if (!overlap && shiftLength <= hoursLeft) {
+        currentSchedule.add(current);
+        currentProfit += profitFor(current);
+        countSchedulesProfit(allShifts, index + 1, currentSchedule, hoursLeft - shiftLength, currentProfit, maxProfit, maxProfitSchedule);
+        currentSchedule.remove(currentSchedule.size() - 1);
+        currentProfit -= profitFor(current);
+    }
+
+    return;
+}
+
+int numSchedulesFor(const Set<Shift>& shifts, int maxHours)
+{
+    if (maxHours < 0) error("maxHours is negative.");
+
+    Vector<Shift> allShifts;
+    for (const Shift& shift : shifts) {
+        allShifts.add(shift);
+    }
+
+    Vector<Shift> currentSchedule;
+    return countSchedules(allShifts, 0, currentSchedule, maxHours);
+}
+
+Set<Shift> maxProfitSchedule(const Set<Shift>& shifts, int maxHours)
+{
+    if (maxHours < 0) error("maxHours is negative.");
+
+    Vector<Shift> allShifts;
+    for (const Shift& shift : shifts) {
+        allShifts.add(shift);
+    }
+
+    Vector<Shift> currentSchedule;
+    Vector<Shift> maxProfitSchedule;
+    int currentProfit = 0;
+    int maxProfit = 0;
+    countSchedulesProfit(allShifts, 0, currentSchedule, maxHours, currentProfit, maxProfit, maxProfitSchedule);
+
+    Set<Shift> maxProfitSheduleSet;
+    for (auto i : maxProfitSchedule)
+    {
+        maxProfitSheduleSet.add(i);
+    }
+
+    return maxProfitSheduleSet;
 }
 
 
@@ -286,42 +370,42 @@ PROVIDED_TEST("numSchedulesFor stress test: Don't generate options exceeding tim
 PROVIDED_TEST("numSchedulesFor stress test: Handles realistic set of shifts") {
     /* Available shifts. */
     Set<Shift> shifts = {
-        { Day::SUNDAY,  8, 14 },
-        { Day::SUNDAY, 12, 18 },
+                         { Day::SUNDAY,  8, 14 },
+                         { Day::SUNDAY, 12, 18 },
 
-        { Day::MONDAY,  8, 12 },
-        { Day::MONDAY, 12, 16 },
-        { Day::MONDAY, 16, 20 },
-        { Day::MONDAY,  8, 16 },
-        { Day::MONDAY, 12, 20 },
+                         { Day::MONDAY,  8, 12 },
+                         { Day::MONDAY, 12, 16 },
+                         { Day::MONDAY, 16, 20 },
+                         { Day::MONDAY,  8, 16 },
+                         { Day::MONDAY, 12, 20 },
 
-        { Day::TUESDAY,  8, 12 },
-        { Day::TUESDAY, 12, 16 },
-        { Day::TUESDAY, 16, 20 },
-        { Day::TUESDAY,  8, 16 },
-        { Day::TUESDAY, 12, 20 },
+                         { Day::TUESDAY,  8, 12 },
+                         { Day::TUESDAY, 12, 16 },
+                         { Day::TUESDAY, 16, 20 },
+                         { Day::TUESDAY,  8, 16 },
+                         { Day::TUESDAY, 12, 20 },
 
-        { Day::WEDNESDAY,  8, 12 },
-        { Day::WEDNESDAY, 12, 16 },
-        { Day::WEDNESDAY, 16, 20 },
-        { Day::WEDNESDAY,  8, 16 },
-        { Day::WEDNESDAY, 12, 20 },
+                         { Day::WEDNESDAY,  8, 12 },
+                         { Day::WEDNESDAY, 12, 16 },
+                         { Day::WEDNESDAY, 16, 20 },
+                         { Day::WEDNESDAY,  8, 16 },
+                         { Day::WEDNESDAY, 12, 20 },
 
-        { Day::THURSDAY,  8, 12 },
-        { Day::THURSDAY, 12, 16 },
-        { Day::THURSDAY, 16, 20 },
-        { Day::THURSDAY,  8, 16 },
-        { Day::THURSDAY, 12, 20 },
+                         { Day::THURSDAY,  8, 12 },
+                         { Day::THURSDAY, 12, 16 },
+                         { Day::THURSDAY, 16, 20 },
+                         { Day::THURSDAY,  8, 16 },
+                         { Day::THURSDAY, 12, 20 },
 
-        { Day::FRIDAY,  8, 12 },
-        { Day::FRIDAY, 12, 16 },
-        { Day::FRIDAY, 16, 20 },
-        { Day::FRIDAY,  8, 16 },
-        { Day::FRIDAY, 12, 20 },
+                         { Day::FRIDAY,  8, 12 },
+                         { Day::FRIDAY, 12, 16 },
+                         { Day::FRIDAY, 16, 20 },
+                         { Day::FRIDAY,  8, 16 },
+                         { Day::FRIDAY, 12, 20 },
 
-        { Day::SATURDAY,  8, 14 },
-        { Day::SATURDAY, 12, 18 },
-    };
+                         { Day::SATURDAY,  8, 14 },
+                         { Day::SATURDAY, 12, 18 },
+                         };
 
     /* There are 38,107 possible schedules you can form from these possible
      * shifts, assuming you have at most 25 hours available.
@@ -336,7 +420,15 @@ PROVIDED_TEST("numSchedulesFor stress test: Handles realistic set of shifts") {
     });
 }
 
-
+STUDENT_TEST("numSchedulesFor handles three non-overlapping shifts") {
+    Set<Shift> shifts = {
+        Shift(Day::MONDAY, 8, 10),
+        Shift(Day::MONDAY, 10, 12),
+        Shift(Day::MONDAY, 12, 15)
+    };
+    EXPECT_EQUAL(numSchedulesFor(shifts, 5), 7);
+    // {}, {1}, {2}, {3}, {1, 2}, {2, 3}, {1, 3}
+}
 
 
 
@@ -544,42 +636,42 @@ PROVIDED_TEST("maxProfitSchedule stress test: Don't generate combinations exceed
 PROVIDED_TEST("maxProfitSchedule stress test: Handles realistic example.") {
     /* Available shifts. */
     Vector<Shift> shifts = {
-        { Day::SUNDAY,  8, 14, 12 },
-        { Day::SUNDAY, 12, 18, 36 },
+                            { Day::SUNDAY,  8, 14, 12 },
+                            { Day::SUNDAY, 12, 18, 36 },
 
-        { Day::MONDAY,  8, 12, 44 },
-        { Day::MONDAY, 12, 16, 32 },
-        { Day::MONDAY, 16, 20,  0 },
-        { Day::MONDAY,  8, 16, 16 },
-        { Day::MONDAY, 12, 20, 22 },
+                            { Day::MONDAY,  8, 12, 44 },
+                            { Day::MONDAY, 12, 16, 32 },
+                            { Day::MONDAY, 16, 20,  0 },
+                            { Day::MONDAY,  8, 16, 16 },
+                            { Day::MONDAY, 12, 20, 22 },
 
-        { Day::TUESDAY,  8, 12, 48 },
-        { Day::TUESDAY, 12, 16, 20 },
-        { Day::TUESDAY, 16, 20, 24 },
-        { Day::TUESDAY,  8, 16, 24 },
-        { Day::TUESDAY, 12, 20, 80 },
+                            { Day::TUESDAY,  8, 12, 48 },
+                            { Day::TUESDAY, 12, 16, 20 },
+                            { Day::TUESDAY, 16, 20, 24 },
+                            { Day::TUESDAY,  8, 16, 24 },
+                            { Day::TUESDAY, 12, 20, 80 },
 
-        { Day::WEDNESDAY,  8, 12, 20 },
-        { Day::WEDNESDAY, 12, 16,  8 },
-        { Day::WEDNESDAY, 16, 20,  8 },
-        { Day::WEDNESDAY,  8, 16, 40 },
-        { Day::WEDNESDAY, 12, 20, 16 },
+                            { Day::WEDNESDAY,  8, 12, 20 },
+                            { Day::WEDNESDAY, 12, 16,  8 },
+                            { Day::WEDNESDAY, 16, 20,  8 },
+                            { Day::WEDNESDAY,  8, 16, 40 },
+                            { Day::WEDNESDAY, 12, 20, 16 },
 
-        { Day::THURSDAY,  8, 12, 40 },
-        { Day::THURSDAY, 12, 16,  0 },
-        { Day::THURSDAY, 16, 20, 24 },
-        { Day::THURSDAY,  8, 16, 56 },
-        { Day::THURSDAY, 12, 20, 32 },
+                            { Day::THURSDAY,  8, 12, 40 },
+                            { Day::THURSDAY, 12, 16,  0 },
+                            { Day::THURSDAY, 16, 20, 24 },
+                            { Day::THURSDAY,  8, 16, 56 },
+                            { Day::THURSDAY, 12, 20, 32 },
 
-        { Day::FRIDAY,  8, 12,  4 },
-        { Day::FRIDAY, 12, 16,  8 },
-        { Day::FRIDAY, 16, 20, 40 },
-        { Day::FRIDAY,  8, 16, 72 },
-        { Day::FRIDAY, 12, 20, 40 },
+                            { Day::FRIDAY,  8, 12,  4 },
+                            { Day::FRIDAY, 12, 16,  8 },
+                            { Day::FRIDAY, 16, 20, 40 },
+                            { Day::FRIDAY,  8, 16, 72 },
+                            { Day::FRIDAY, 12, 20, 40 },
 
-        { Day::SATURDAY,  8, 14, 18 },
-        { Day::SATURDAY, 12, 18, 66 },
-    };
+                            { Day::SATURDAY,  8, 14, 18 },
+                            { Day::SATURDAY, 12, 18, 66 },
+                            };
 
     /* This code should finish in at most four seconds. That is a 10x margin of safety
      * over our unoptimized reference implementation run on a middle-of-the-line
@@ -589,4 +681,9 @@ PROVIDED_TEST("maxProfitSchedule stress test: Handles realistic example.") {
         auto answer = maxProfitSchedule(asSet(shifts), 25);
         EXPECT_EQUAL(answer, { shifts[2], shifts[7], shifts[11], shifts[17], shifts[24] });
     });
+}
+
+STUDENT_TEST("maxProfitSchedule works on empty schedule.") {
+    Vector<Shift> shifts = {};
+    EXPECT_EQUAL(maxProfitSchedule(asSet(shifts), 100), {});
 }
