@@ -2,11 +2,31 @@
 using namespace std;
 
 Optional<Set<int>> makeTarget(const Set<int>& elems, int target) {
-    /* TODO: Delete this comment and the next few lines, then implement this
-     * function.
-     */
-    (void) elems;
-    (void) target;
+
+    if (target == 0) /* Return empty subset */ return {};
+
+    if (elems.isEmpty()) /* No elements left and target != 0, can't make target */ return Nothing;
+
+    // Choose an element from the set
+    int elem = elems.first();
+    // Rest
+    Set<int> rest = elems;
+    rest.remove(elem);
+
+    // Include the element
+    Optional<Set<int>> withElem = makeTarget(rest, target - elem);
+    if (withElem != Nothing) {
+        withElem.value().add(elem); // Add the current element to the subset
+        return withElem;
+    }
+
+    // Exclude the element
+    Optional<Set<int>> withoutElem = makeTarget(rest, target);
+    if (withoutElem != Nothing) {
+        return withoutElem;
+    }
+
+    // Neither worked
     return Nothing;
 }
 
@@ -57,4 +77,13 @@ PROVIDED_TEST("Works for a three-element set.") {
     EXPECT_EQUAL(makeTarget({ 1, 3, 4 },  7), {3, 4});
     EXPECT_EQUAL(makeTarget({ 1, 3, 4 },  8), {1, 3, 4});
     EXPECT_EQUAL(makeTarget({ 1, 3, 4 },  9), Nothing);
+}
+
+STUDENT_TEST("Works for a four-element set.")
+{
+
+    EXPECT_EQUAL((makeTarget({ 1, 3, 4, 9 }, 13)), {1, 3, 9});
+    EXPECT_EQUAL((makeTarget({ 1, 3, 4, 5 }, 13)), {1, 3, 4, 5});
+    EXPECT_EQUAL((makeTarget({ 1, 31, 42, 54 }, 0)), {});
+
 }
